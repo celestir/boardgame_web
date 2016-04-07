@@ -1,0 +1,454 @@
+<html>
+	<head>
+		<style>
+			.tiles
+			{
+				border: 1px solid black;
+				position: absolute;
+				width: 100;
+				height:100;
+				background-color: gray;
+			}
+			.player
+			{
+				border: 1px solid blue;
+				position: absolute;
+				width: 100;
+				height: 100;
+			}
+			.panel
+			{
+				border: solid 1px black`;
+				height: 50;
+				width: 270;
+				position:  absolute;
+				top: 520;
+				left: 240;
+				
+			}
+			.label
+			{
+				border: solid 1px red;
+				position: absolute;
+				top: 10;
+				left : 10;
+				width: 130;
+				height: 30;
+			}
+			.btnroll
+			{
+				position: absolute;
+				top: 10;
+				left:190;
+				width: 70;
+				height: 32;
+				background-color: black;
+				color: white;
+				disabled: true;
+				visibility: hidden;
+			}
+
+			.dice
+			{
+				position: absolute;
+				top: 150;
+				left: 150;
+				border: 1px solid red;
+				width: 200;
+				height: 200;
+				background-color: blue;
+				visibility: hidden;
+			}
+
+			.menu
+			{
+				position: absolute;
+				top: 210;
+				left: 110;
+				border: 1px solid green;
+				width: 300;
+				height: 100;
+				background-color: white;
+		 
+			}
+
+			.menuBtn
+			{
+				position: absolute;
+				top: 30;
+				left: 20;
+				width: 80;
+				height:40;
+
+			}
+			</style>
+		<script>
+		var changePlayer = false;
+			var menuPanel;
+			var menuBtn = new Array();
+			var theObstacles = [["missed 1 turn","move 1 step forward","move 1 step backward","missed 1 turn","go back to start","move 2 spaces backward","finish","go back to start","move 1 step forward","move 2 spaces backward","move 2 spaces backward"],
+			["","-1","1","-1","1","0","2","","","",""]];//the obstacles
+			var playerNumOfTurn = [0,0];
+			var theTiles = new Array();
+			var playerTurn = 0;
+			var numOfMove2 = 0;
+			var direction2 = "forward";
+			var playerStatus = ["",""];
+			var timer;
+			var started = false;
+
+//============================================================================================================================
+			function createTiles()// the tiles of the game
+			{
+				var counter  = 24;
+				var xPosition = 10, yPosition =10;
+				
+				for(var a=4;a>=0;a--)
+				{
+					
+					for(var b=4;b>=0;b--)
+					{
+						var tile = "<div class = \"tiles\" id = "+counter+" style =\"left:"+xPosition+"; top:"+yPosition+";\">"+counter+"</div>";//creating the tiles
+						document.write(tile);
+						xPosition +=100;
+						theTiles[counter] = document.getElementById(counter);
+						
+						counter--;
+
+					}
+					xPosition = 10;
+					yPosition +=100;
+				}
+			}
+			
+//=============================================================================================================================\
+	function createPlayers()
+	{
+		var playerPos_x = 10, playerPos_y = 520;
+		var playerColor = ["green","blue"];
+		for(var a=0;a<2;a++)
+		{
+			document.write("<div class =\"player\" id = p"+(a+1)+" "+
+			"style=\"top:"+playerPos_y+"; left: "+playerPos_x+"; background-color: "+playerColor[a]+"\">P"+(a)+"</div>");
+			playerPos_x +=120;
+		}
+	}
+	
+	function createPanel()
+	{
+		document.writeln("<div class=\"panel\">");
+		document.write("<div class = \"label\">PLAYER'S TURN : </div>");
+		document.write("<div id = \"lblPTurn\" style = \"position: absolute; top: 10; left: 145;"+
+		" width: 40; height: 30; border: solid 1px red; \">P0</div>");
+		document.write("<input class = \"btnroll\" id =\"btnroll2\" type=\"button\" onclick= \"callMovePlayer()\" value = roll dice>");
+		document.writeln("</div>");
+		document.getElementById("btnroll2").disabled = true;
+	}
+	function creatGameMenu()
+	{
+		var x=30;
+		var vals = ["START","DEVELOPER","QUIT"];
+		var clicks = ["callStart()","callDev()","callQuit()"];
+		document.writeln("<div class = \"menu\" id = \"gameMenu\">");
+		for(var a=0;a<3;a++)
+		{
+			document.write("<input class= \"menuBtn\" type=button id = \"start\" style=\"left:"+x+";\" value =\""+vals[a]+"\" onclick=\""+clicks[a]+"\">");
+			x+=80;
+			menuBtn[a] = document.getElementById("btn"+a);
+		}
+		
+		document.writeln("</div>");
+		menuPanel = document.getElementById("gameMenu");
+
+
+	}
+	function createDice()
+	{
+		document.writeln("<div class = \"dice\" id = \"dice2\">");
+		document.writeln("</div>");
+	}	
+	var theDice;
+	var ranDice;
+	function callMovePlayer()
+	{
+
+
+		//numOfMove2 = 25;
+		numOfMove2 = parseInt(Math.random()*6)+1;
+		theDice = document.getElementById("dice2");
+		theDice.style.visibility = "visible";
+		document.getElementById("btnroll2").disabled = true;
+		var counter = 0;
+		randomDice();
+		var timer2= setInterval(function()
+			{
+				
+				counter++;
+				if(counter==3)
+				{
+					clearInterval(ranDice);
+					theDice.innerHTML= "<image src =\""+numOfMove2+".png"+"\" width=200 height = 200>";
+					alert("number of moves " + numOfMove2);
+					theDice.style.visibility = "hidden";
+					movePlayer(player[playerTurn],numOfMove2,direction2,playerCurrentPos[playerTurn][1]);
+					clearInterval(timer2);
+					
+				}
+			},1000);
+		
+	}
+	function randomDice()
+	{
+		var pics = [1,2,3,4,5,6];
+		var counter=0;
+		ranDice = setInterval(
+			function()
+			{
+				theDice.innerHTML = "<image src =\""+pics[counter]+".png"+"\" width=200 height = 200>";
+				counter++;
+				if(counter>=6)
+				{
+					counter=0;
+				}	
+			},50);
+	}
+
+var change = false;
+	function movePlayer(thePlayer,numOfMove,direction,playerCurrentPos2)
+	{
+		restoreSize();
+		var targetPos = 0;
+		var targetTile;
+		document.getElementById("btnroll2").disabled=true;
+		if(direction == "forward")
+		{
+			targetPos = parseInt(playerCurrentPos2) + parseInt(numOfMove);	
+		}
+		else
+		{
+			targetPos = parseInt(playerCurrentPos2) - parseInt(numOfMove);		
+		}
+		
+		if(targetPos>24)
+		{
+			targetPos=24;
+		}
+		timer = setInterval(function()
+		{
+	//		document.getElementById("btnroll2").disabled = true;
+			if(direction== "forward")
+			{
+				targetTile = theTiles[playerCurrentPos2+=1];	
+			}
+			else
+			{ 
+				targetTile = theTiles[playerCurrentPos2-=1];	
+			}
+			thePlayer.style.top = targetTile.style.top;
+			thePlayer.style.left = targetTile.style.left;
+			if(playerCurrentPos2 == targetPos)
+			{
+				
+				change=true;
+				clearInterval(timer);
+				document.getElementById("btnroll2").disabled = false;
+				checkObstacle(thePlayer);
+				playerTurn ++;
+				changePlayer = false;
+				if(playerTurn>=2)
+				{
+					playerTurn = 0;
+				}
+				checkStatus(playerTurn);
+				document.getElementById("lblPTurn").innerHTML = "P" + playerTurn;
+				if(change==true)
+				{
+					 checkCollision();
+					 
+					 change=false;	
+				}
+				
+			}
+	
+			
+		},100); 	
+		playerCurrentPos[playerTurn][1] = targetPos;
+		
+	}
+
+	function checkStatus(playerTurn2)
+	{
+		if(playerStatus[playerTurn2]== theObstacles[0][0])
+		{
+		//	alert("SASASAS");
+			playerTurn++;
+			if(playerTurn>=2)
+			{
+				playerTurn=0;
+			}
+			playerStatus[playerTurn2] = "";
+		}
+	}
+
+	function addObstacles()
+	{
+		var arr = [3,8,10,15,18,20,24,2,17,23,22];
+		for(var a=0;a<arr.length;a++)
+		{
+			theTiles[arr[a]].innerHTML = theObstacles[0][a];
+		}
+	}
+	function checkObstacle(player)
+	{
+		var theObstacle = theTiles[playerCurrentPos[playerTurn][1]].innerHTML;
+			//alert(theObstacle);
+
+
+		switch(theObstacle)
+		{
+			case theObstacles[0][0]:alert(theObstacles[0][0]); 
+				playerNumOfTurn[playerTurn] -=1; 
+				playerStatus[playerTurn]=theObstacles[0][0];	
+				change=false;
+				break;
+			case theObstacles[0][3]: alert(theObstacles[0][0]);
+				 playerNumOfTurn[playerTurn] -=1;
+				  playerStatus[playerTurn]=theObstacles[0][0];
+				  change=false;
+				  break;
+			case theObstacles[0][1]:alert(theObstacles[0][1]);
+				movePlayer(player,1,"forward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				 playerTurn-=1;break;
+			case theObstacles[0][6]: alert("P" + (playerTurn) +" wins");
+				clearInterval(timer);
+				document.getElementById("btnroll2").disabled = true;
+				change=false;
+				document.getElementById("btnroll2").style.visibility="hidden";
+				menuPanel.style.visibility = "visible";
+				 break;
+			case theObstacles[0][2]:alert(theObstacles[0][2]);
+				movePlayer(player,1,"backward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				playerTurn-=1;
+				break;
+			case theObstacles[0][4]: alert(theObstacles[0][4]);
+				if(playerCurrentPos[playerTurn][1]==18)
+				{
+					movePlayer(player,18,"backward",playerCurrentPos[playerTurn][1]);
+				}
+
+				else
+				{
+					movePlayer(player,2,"backward",playerCurrentPos[playerTurn][1]);
+				}
+				playerTurn-=1;
+				change=false;
+				break;
+				case theObstacles[0][7]: alert(theObstacles[0][7]);
+				movePlayer(player,2,"backward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				playerTurn-=1;
+				break;
+			case theObstacles[0][5]:alert(theObstacles[0][5]);
+				movePlayer(player,2,"backward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				playerTurn-=1;
+				break;
+			case theObstacles[0][8]:alert(theObstacles[0][8]);
+				movePlayer(player,1,"forward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				playerTurn-=1;
+				break;
+			case theObstacles[0][9]:alert(theObstacles[0][9]);
+				movePlayer(player,2,"backward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				playerTurn-=1;
+				break;
+			case theObstacles[0][10]:alert(theObstacles[0][10]);
+				movePlayer(player,2,"backward",playerCurrentPos[playerTurn][1]);
+				change=false;
+				playerTurn-=1;
+				break;
+
+		}
+	}
+
+	function callStart()
+	{
+		if(started==false)
+		{
+
+			menuPanel.style.visibility= "hidden";
+			document.getElementById("btnroll2").style.visibility = "visible";
+			document.getElementById("btnroll2").disabled = false;
+			started = true;
+		}
+		else if (started==true)
+		{
+				player[0].style.top = parseInt(document.getElementById("4").style.top) + 110;
+				player[0].style.left = parseInt(document.getElementById("4").style.left	);
+				player[1].style.top = parseInt(document.getElementById("4").style.top) + 110;
+				player[1].style.left = parseInt(document.getElementById("4").style.left	)+120;
+				menuPanel.style.visibility= "hidden";
+				document.getElementById("btnroll2").style.visibility = "visible";
+				document.getElementById("btnroll2").disabled = false;
+				menuPanel.style.visibility= "hidden";
+				document.getElementById("btnroll2").style.visibility = "visible";
+				document.getElementById("btnroll2").disabled = false;
+				playerCurrentPos[0][1] = -1;
+				playerCurrentPos[1][1] = -1;
+				started = true;started = true;
+			
+		}
+	}
+	
+	
+	function checkCollision()
+	{
+			if(playerCurrentPos[0][1] == playerCurrentPos[1][1])
+			{
+				//alert("collided");
+				player[1].style.height=50;
+			}
+			
+		
+	}
+	function restoreSize()
+	{
+		player[1].style.height=100;
+	}
+
+	function callDev()
+	{
+		alert("Developed by JUN JARDIN");
+	}
+
+	function callQuit()
+	{}
+	
+		
+//==============================================================================================================================
+			createTiles();	// call the func.
+			createPlayers();
+			createDice();
+			createPanel();
+			creatGameMenu();
+			addObstacles();
+			var startPos_x = document.getElementById("0").style.left;
+			var startPos_y = document.getElementById("0").style.top;
+			var player = [document.getElementById("p1"),document.getElementById("p2")];
+			var playerCurrentPos = [[player[0].id, -1],
+									[player[1].id,-1]];
+
+									
+	//		movePlayer(player[playerTurn],9,"forward",-1);
+			// n,0 = name, n,1 = top, n,2 = left								
+//=================================================================================================================================
+		</script>
+	</head>
+	
+	<body>
+	</body>
+</html>
+
